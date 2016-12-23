@@ -3,7 +3,7 @@
 function thereIsAnError(textToShow, errorToShow, imageUrl) {
     "use strict";
 
-    document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Wow! Some error arrived!</h1></center><br/><br/><p>' + textToShow + '</p><br/><br/><p>' + errorToShow + '</p><p>' + imageUrl + '</p>';
+    document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Wow! Some error arrived!<br/>Please make <a href="https://vk.com/ngalayko">me</a> know</h1></center><br/><br/><p>' + textToShow + '</p><br/><br/><p>' + errorToShow + '</p><p>' + imageUrl + '</p>';
 }
 
 /**
@@ -13,7 +13,7 @@ function thereIsAnError(textToShow, errorToShow, imageUrl) {
  * @param  {string} fileName Name of the new uploaded file on VK documents
  * @param  {string} accToken Access token with vk authentication permissions
  */
-function upload(imageUrl, fileName, accToken) {
+function upload(imageUrl, fileName, accToken, albumId, groupId) {
     "use strict";
 
     var uploadHttpRequest = new XMLHttpRequest();
@@ -24,7 +24,9 @@ function upload(imageUrl, fileName, accToken) {
             requestFormData,
             documentUploadRequest;
 
-        documentUploadServer.open('GET', 'https://api.vk.com/method/docs.getUploadServer?access_token=' + accToken);
+        documentUploadServer.open('GET', 'https://api.vk.com/method/photos.getUploadServer?access_token=' + accToken + 
+            '&album_id=' + albumId + 
+            '&group_id=' + groupId);
 
         documentUploadServer.onload = function () {
 
@@ -57,29 +59,52 @@ function upload(imageUrl, fileName, accToken) {
                 var answer = JSON.parse(documentUploadRequest.response),
                     documentSaveRequest;
 
-                if (answer.file === undefined) {
-                    thereIsAnError('Upload blob problem response problem', answer, imageUrl);
+                if (answer.photos_list == "[]") {
+                    thereIsAnError('Upload blob response problem', answer, imageUrl);
 
                     return;
                 }
 
                 documentSaveRequest = new XMLHttpRequest();
 
-                documentSaveRequest.open('GET', 'https://api.vk.com/method/docs.save?file=' + answer.file + '&access_token=' + accToken);
+                documentSaveRequest.open('GET', 'https://api.vk.com/method/photos.save?access_token=' + accToken + 
+                    '&group_id=' + groupId + 
+                    '&server=' + answer.server + 
+                    '&photos_list=' + answer.photos_list + 
+                    '&hash=' + answer.hash + 
+                    '&album_id=' + albumId);
 
                 documentSaveRequest.onload = function () {
 
-                    var answer = JSON.parse(documentSaveRequest.response);
+                    var answer = JSON.parse(documentSaveRequest.response),
+                        documentCopyRequest;
 
-                    if (answer.response[0].url === undefined) {
+                    if (answer.response[0].src === undefined) {
                         thereIsAnError('documentSaveRequest - no file in response', answer, imageUrl);
 
                         return;
                     }
 
-                    document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Successfully uploaded!</h1></center><br/>';
-                    setTimeout(function () { window.close(); }, 3000);
+                    console.log(answer)
+
+                    documentCopyRequest = new XMLHttpRequest();
+
+                    documentCopyRequest.open('GET', 'https://api.vk.com/method/photos.copy?access_token=' + accToken + 
+                        '&owner_id=' + parseInt(answer.response[0].owner_id) + 
+                        '&photo_id=' + parseInt(answer.response[0].pid));
+
+                    documentCopyRequest.onload = function () {
+                        var answer = JSON.parse(documentCopyRequest.response)
+
+                        console.log(answer)
+
+                        document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Successfully saved!</h1></center><br/>';
+                        window.close();
+                    };
+
+                    documentCopyRequest.send();
                 };
+
 
                 documentSaveRequest.send();
             };
@@ -137,6 +162,9 @@ document.addEventListener("DOMContentLoaded", function () {
         imageName = imageName.slice(0, imageName.indexOf('&'));
     }
 
-    upload(imageUrl, imageName, params[1]);
+    var groupId = '135979114'
+    var albumId = '239088453'
+
+    upload(imageUrl, imageName, params[1], albumId, groupId);
 });
 

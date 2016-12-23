@@ -1,6 +1,4 @@
-vk.com rehosting in docs
-========================
+vk.com rehosting in pictures
+==========================
 
-расширение позволяет в один клик перезалить картинку в свой аккаунт в сети вконтакте в раздел документы
-
-Лицензия - WTFPL
+Adds a button to action menu which allows you to save picture directly to vk 'saved' pictures album

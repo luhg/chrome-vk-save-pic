@@ -80,7 +80,7 @@ function listenerHandler(authenticationTabId, imageSourceUrl) {
                     chrome.tabs.update(
                         tabId,
                         {
-                            'url'   : 'upload.html#' + imageSourceUrl + '&' + vkAccessToken,
+                            'url'   : './html/upload.html#' + imageSourceUrl + '&' + vkAccessToken,
                             'active': true
                         },
                         function (tab) {}
@@ -91,45 +91,49 @@ function listenerHandler(authenticationTabId, imageSourceUrl) {
     };
 }
 
-/**
- * Handle main functionality of 'onlick' chrome context menu item method
- */
-function getClickHandler() {
-    "use strict";
+chrome.runtime.onInstalled.addListener(function() {
+    /**
+    * Handler of chrome context menu creation process -creates a new item in the context menu
+    */
+    chrome.contextMenus.create({
+        "title": "Save to VK",
+        "type": "normal",
+        "contexts": ["image"],
+        "onclick": getClickHandler()
+    });
 
-    return function (info, tab) {
 
-        var imageSourceUrl       = info.srcUrl,
-            imageUploadHelperUrl = 'upload.html#',
-            vkCLientId           = '3315996',
-            vkRequestedScopes    = 'docs,offline',
-            vkAuthenticationUrl  = 'https://oauth.vk.com/authorize?client_id=' + vkCLientId + '&scope=' + vkRequestedScopes + '&redirect_uri=http%3A%2F%2Foauth.vk.com%2Fblank.html&display=page&response_type=token';
+    /**
+     * Handle main functionality of 'onlick' chrome context menu item method
+     */
+    function getClickHandler() {
+        "use strict";
 
-        chrome.storage.local.get({'vkaccess_token': {}}, function (items) {
+        return function (info, tab) {
 
-            if (items.vkaccess_token.length === undefined) {
-                chrome.tabs.create({url: vkAuthenticationUrl, selected: true}, function (tab) {
-                    chrome.tabs.onUpdated.addListener(listenerHandler(tab.id, imageSourceUrl));
-                });
+            var imageSourceUrl       = info.srcUrl,
+                imageUploadHelperUrl = './html/upload.html#',
+                vkCLientId           = '5791300',
+                vkRequestedScopes    = 'photos,offline',
+                vkAuthenticationUrl  = 'https://oauth.vk.com/authorize?client_id=' + vkCLientId + '&scope=' + vkRequestedScopes + '&redirect_uri=http%3A%2F%2Foauth.vk.com%2Fblank.html&display=page&response_type=token';
 
-                return;
-            }
+            chrome.storage.local.get({'vkaccess_token': {}}, function (items) {
 
-            imageUploadHelperUrl += imageSourceUrl + '&' + items.vkaccess_token;
+                if (items.vkaccess_token.length === undefined) {
+                    chrome.tabs.create({url: vkAuthenticationUrl, selected: true}, function (tab) {
+                        chrome.tabs.onUpdated.addListener(listenerHandler(tab.id, imageSourceUrl));
+                    });
 
-            chrome.tabs.create({url: imageUploadHelperUrl, selected: true});
+                    return;
+                }
 
-        });
-    };
-}
+                imageUploadHelperUrl += imageSourceUrl + '&' + items.vkaccess_token;
 
-/**
- * Handler of chrome context menu creation process -creates a new item in the context menu
- */
-chrome.contextMenus.create({
-    "title": "Rehost on vk.com",
-    "type": "normal",
-    "contexts": ["image"],
-    "onclick": getClickHandler()
+                chrome.tabs.create({url: imageUploadHelperUrl});
+
+            });
+        };
+    }
 });
+
 
