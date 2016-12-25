@@ -112,7 +112,7 @@ chrome.runtime.onInstalled.addListener(function() {
         return function (info, tab) {
 
             var imageSourceUrl       = info.srcUrl,
-                imageUploadHelperUrl = './html/upload.html#',
+                imageUploadHelperUrl = './html/background.html#',
                 vkCLientId           = '5791300',
                 vkRequestedScopes    = 'photos,offline',
                 vkAuthenticationUrl  = 'https://oauth.vk.com/authorize?client_id=' + vkCLientId + '&scope=' + vkRequestedScopes + '&redirect_uri=http%3A%2F%2Foauth.vk.com%2Fblank.html&display=page&response_type=token';
@@ -129,8 +129,7 @@ chrome.runtime.onInstalled.addListener(function() {
 
                 imageUploadHelperUrl += imageSourceUrl + '&' + items.vkaccess_token;
 
-                chrome.tabs.create({url: imageUploadHelperUrl});
-
+                chrome.tabs.create({url: imageUploadHelperUrl, active: false});
             });
         };
     }

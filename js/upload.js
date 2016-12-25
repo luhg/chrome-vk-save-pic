@@ -3,7 +3,9 @@
 function thereIsAnError(textToShow, errorToShow, imageUrl) {
     "use strict";
 
-    document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Wow! Some error arrived!<br/>Please make <a href="https://vk.com/ngalayko">me</a> know</h1></center><br/><br/><p>' + textToShow + '</p><br/><br/><p>' + errorToShow + '</p><p>' + imageUrl + '</p>';
+    console.log(textToShow);
+    console.log(errorToShow);
+    console.log(imageUrl);
 }
 
 /**
@@ -35,8 +37,7 @@ function upload(imageUrl, fileName, accToken, albumId, groupId) {
             if (answer.error !== undefined) {
                 chrome.storage.local.remove('vkaccess_token');
 
-                document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Ops. Something went wrong. Please try again.</h1></center><br/>';
-                setTimeout(function () { window.close(); }, 3000);
+                thereIsAnError('something went wrong', answer.error, imageUrl)
 
                 return;
             }
@@ -85,8 +86,6 @@ function upload(imageUrl, fileName, accToken, albumId, groupId) {
                         return;
                     }
 
-                    console.log(answer)
-
                     documentCopyRequest = new XMLHttpRequest();
 
                     documentCopyRequest.open('GET', 'https://api.vk.com/method/photos.copy?access_token=' + accToken + 
@@ -96,9 +95,6 @@ function upload(imageUrl, fileName, accToken, albumId, groupId) {
                     documentCopyRequest.onload = function () {
                         var answer = JSON.parse(documentCopyRequest.response)
 
-                        console.log(answer)
-
-                        document.getElementById('wrap').innerHTML = '<p></p><br/><br/><center><h1>Successfully saved!</h1></center><br/>';
                         window.close();
                     };
 

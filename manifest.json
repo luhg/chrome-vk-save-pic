@@ -1,17 +1,15 @@
 {
+  "name": "VK save picture",
+  "description": "Save any image in vk.com 'saved pictures' album",
+  "version": "1.0",
+  "permissions": [ "contextMenus", "tabs", "storage" , "http://*/*", "https://*/*" ],
   "background": {
-    "scripts": [      
-      "./js/background.js"
-    ]
+    "page": "./html/background.html"
   },
-   "description": "Save any image in vk.com 'saved pictures' album",
-   "icons": {
-      "128": "./pic/icon_128.png",
-      "16": "./pic/icon_16.png",
-      "48": "./pic/icon_48.png"
-   },
-   "manifest_version": 2,
-   "name": "VK save picture",
-   "permissions": [ "contextMenus", "tabs", "storage" , "http://*/*", "https://*/*" ],
-   "version": "1.0"
+  "icons": {
+    "128": "./pic/icon_128.png",
+    "16": "./pic/icon_16.png",
+    "48": "./pic/icon_48.png"
+  },
+  "manifest_version": 2
 }
