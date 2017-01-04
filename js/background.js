@@ -95,6 +95,7 @@ function listenerHandler(authenticationTabId, imageSourceUrl) {
 * Handler of chrome context menu creation process -creates a new item in the context menu
 */
 chrome.contextMenus.create({
+    "id": "just an id to avoid duplicates",
     "title": "Save to VK",
     "type": "normal",
     "contexts": ["image"],

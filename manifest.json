@@ -1,7 +1,7 @@
 {
   "name": "VK save picture",
   "description": "Save any image in vk.com 'saved pictures' album",
-  "version": "1.1.2",
+  "version": "1.1.1",
   "permissions": [ "contextMenus", "tabs", "storage" , "http://*/*", "https://*/*" ],
   "background": {
     "page": "./html/background.html"
