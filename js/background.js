@@ -91,7 +91,7 @@ function listenerHandler(authenticationTabId, imageSourceUrl) {
     };
 }
 
-chrome.runtime.onInstalled.addListener(function() {
+chrome.tabs.onCreated.addListener(function() {
     /**
     * Handler of chrome context menu creation process -creates a new item in the context menu
     */
