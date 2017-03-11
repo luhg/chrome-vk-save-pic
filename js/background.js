@@ -33,9 +33,11 @@ function getUrlParameterValue(url, parameterName) {
     for (index = 0; index < urlParameters.length; index += 1) {
         temp = urlParameters[index].split("=");
 
-        if (temp[0] === parameterName) {
-            return temp[1];
+        if (temp[0] !== parameterName) {
+            continue;
         }
+
+        return temp[1];
     }
 
     return parameterValue;
@@ -56,38 +58,41 @@ function listenerHandler(authenticationTabId, imageSourceUrl) {
         var vkAccessToken,
             vkAccessTokenExpiredFlag;
 
-        if (tabId === authenticationTabId && changeInfo.url !== undefined && changeInfo.status === "loading") {
-
-            if (changeInfo.url.indexOf('oauth.vk.com/blank.html') > -1) {
-                authenticationTabId = null;
-                chrome.tabs.onUpdated.removeListener(tabUpdateListener);
-
-                vkAccessToken = getUrlParameterValue(changeInfo.url, 'access_token');
-
-                if (vkAccessToken === undefined || vkAccessToken.length === undefined) {
-                    displayeAnError('vk auth response problem', 'access_token length = 0 or vkAccessToken == undefined');
-                    return;
-                }
-
-                vkAccessTokenExpiredFlag = Number(getUrlParameterValue(changeInfo.url, 'expires_in'));
-
-                if (vkAccessTokenExpiredFlag !== 0) {
-                    displayeAnError('vk auth response problem', 'vkAccessTokenExpiredFlag != 0' + vkAccessToken);
-                    return;
-                }
-
-                chrome.storage.local.set({'vkaccess_token': vkAccessToken}, function () {
-                    chrome.tabs.update(
-                        tabId,
-                        {
-                            'url'   : './html/upload.html#' + imageSourceUrl + '&' + vkAccessToken,
-                            'active': true
-                        },
-                        function (tab) {}
-                    );
-                });
-            }
+        if (tabId !== authenticationTabId || changeInfo.url === undefined || changeInfo.status !== "loading") {
+            return;
         }
+          
+        if (changeInfo.url.indexOf('oauth.vk.com/blank.html') <= -1) {
+            return;
+        }
+
+        authenticationTabId = null;
+        chrome.tabs.onUpdated.removeListener(tabUpdateListener);
+
+        vkAccessToken = getUrlParameterValue(changeInfo.url, 'access_token');
+
+        if (vkAccessToken === undefined || vkAccessToken.length === undefined) {
+            displayeAnError('vk auth response problem', 'access_token length = 0 or vkAccessToken == undefined');
+            return;
+        }
+
+        vkAccessTokenExpiredFlag = Number(getUrlParameterValue(changeInfo.url, 'expires_in'));
+
+        if (vkAccessTokenExpiredFlag !== 0) {
+            displayeAnError('vk auth response problem', 'vkAccessTokenExpiredFlag != 0' + vkAccessToken);
+            return;
+        }
+
+        chrome.storage.local.set({'vkaccess_token': vkAccessToken}, function () {
+            chrome.tabs.update(
+                tabId,
+                {
+                    'url'   : './html/upload.html#' + imageSourceUrl + '&' + vkAccessToken,
+                    'active': true
+                },
+                function (tab) {}
+            );
+        });
     };
 }
 
@@ -101,7 +106,6 @@ chrome.contextMenus.create({
     "contexts": ["image"],
     "onclick": getClickHandler()
 });
-
 
 /**
  * Handle main functionality of 'onlick' chrome context menu item method
