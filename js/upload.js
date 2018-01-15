@@ -88,14 +88,27 @@ function upload(imageUrl, fileName, accToken, albumId, groupId) {
 
                     documentCopyRequest = new XMLHttpRequest();
 
+                    var ownerId = parseInt(answer.response[0].owner_id);
+                    var photoId = parseInt(answer.response[0].pid);
+
                     documentCopyRequest.open('GET', 'https://api.vk.com/method/photos.copy?access_token=' + accToken + 
-                        '&owner_id=' + parseInt(answer.response[0].owner_id) + 
-                        '&photo_id=' + parseInt(answer.response[0].pid));
+                        '&owner_id=' + ownerId + 
+                        '&photo_id=' + photoId);
 
                     documentCopyRequest.onload = function () {
                         var answer = JSON.parse(documentCopyRequest.response)
 
-                        window.close();
+                        var documentDeleteRequest = new XMLHttpRequest();
+
+                        documentDeleteRequest.open('GET', 'https://api.vk.com/method/photos.delete?access_token=' + accToken + 
+                            '&owner_id=' + ownerId + 
+                            '&photo_id=' + photoId);
+
+                        documentDeleteRequest.onload = function() {
+                            window.close()
+                        }
+
+                        documentDeleteRequest.send();
                     };
 
                     documentCopyRequest.send();
